@@ -11,17 +11,6 @@ compiler:
 script:
   - sudo apt update
   - sudo apt install valgrind
-<<<<<<< HEAD
-=======
-  
-  
-  - git clone https://github.com/google/googletest.git -b release-1.11.0
-  - cd googletest
-  - mkdir build
-  - cd build
-  - cmake .. -DBUILD_GMOCK=OFF
-  - cd ../..
->>>>>>> f5a4173b9b3c23f9631cf2e2723a85b8198eb525
   - cmake ./CMakeLists.txt
   - make
   - ls
