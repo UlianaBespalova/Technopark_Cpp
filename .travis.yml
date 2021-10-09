@@ -11,7 +11,7 @@ compiler:
 script:
   - sudo apt update
   - sudo apt install valgrind
-  
+  - sudo apt install cppcheck
   
   - git clone https://github.com/google/googletest.git -b release-1.11.0
   - cd googletest
@@ -24,3 +24,4 @@ script:
   - ls
   - ./tests
   - valgrind ./tests
+  - cppcheck --inconclusive --enable=all --language=c ./shapes.c ./main.c
