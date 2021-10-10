@@ -33,5 +33,5 @@ script:
   - cppcheck --inconclusive --enable=all --language=c ./shapes.c ./main.c
   
 after_success:
+  - lcov --capture --directory . --output-file coverage.info
   - bash <(curl -s https://codecov.io/bash)  
-  - lcov —capture —directory . —output-file coverage.info
