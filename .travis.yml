@@ -27,5 +27,7 @@ script:
   - make
   - ls
   - ./tests
+  
   - valgrind ./tests
   - cppcheck --inconclusive --enable=all --language=c ./shapes.c ./main.c
+  - cpplint ./shapes.c ./main.c ./tests.cpp
