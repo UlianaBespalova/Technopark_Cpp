@@ -1,5 +1,4 @@
 sudo: required
-
 language: cpp
 
 os:
@@ -7,6 +6,10 @@ os:
 
 compiler:
   - g++
+  
+env:
+  global:
+    - CODECOV_TOKEN='b233dcfd-60f5-4f1e-a30f-846ec3f3a3f6'
 
 script:
   - sudo apt update
@@ -27,3 +30,5 @@ script:
   - valgrind ./tests
   - cppcheck --inconclusive --enable=all --language=c ./shapes.c ./main.c
   
+after_success:
+  - bash <(curl -s https://codecov.io/bash)  
