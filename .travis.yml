@@ -34,4 +34,5 @@ script:
   
 after_success:
   - lcov --capture --directory . --output-file coverage.info
-  - bash <(curl -s https://codecov.io/bash)  
+  - lcov --list coverage.info
+  - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "No coverage reports"
