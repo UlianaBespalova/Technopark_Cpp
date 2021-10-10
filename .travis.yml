@@ -35,4 +35,3 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)  
   - lcov —capture —directory . —output-file coverage.info
-  - cat ./coverage.info
