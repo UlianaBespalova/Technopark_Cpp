@@ -17,11 +17,14 @@ install:
   - sudo apt install cppcheck
   - sudo apt-get install lcov
   # Google tests
-  - sudo apt-get install libgtest-dev
-  - cd /usr/src/gtest
-  - sudo cmake .
-  - sudo make
-  - sudo cp *.a /usr/lib
+  - git clone https://github.com/google/googletest.git -b release-1.11.0
+  - cd googletest
+  - mkdir build
+  - cd build
+  - cmake .. -DBUILD_GMOCK=OFF
+  - make
+  - sudo make install
+  - cd ../..
 
 script:   
   - cmake ./CMakeLists.txt
