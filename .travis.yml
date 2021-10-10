@@ -10,20 +10,20 @@ compiler:
 env:
   global:
     - CODECOV_TOKEN='b233dcfd-60f5-4f1e-a30f-846ec3f3a3f6'
-
-script:
+    
+install:
   - sudo apt update
   - sudo apt install valgrind
   - sudo apt install cppcheck
   - sudo apt-get install lcov
-  
-  - git clone https://github.com/google/googletest.git -b release-1.11.0
-  - cd googletest
-  - mkdir build
-  - cd build
-  - cmake .. -DBUILD_GMOCK=OFF
-  - cd ../..
-  
+  # Google tests
+  - sudo apt-get install libgtest-dev
+  - cd /usr/src/gtest
+  - sudo cmake .
+  - sudo make
+  - sudo cp *.a /usr/lib
+
+script:   
   - cmake ./CMakeLists.txt
   - make
   - ls
