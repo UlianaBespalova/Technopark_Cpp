@@ -1,9 +1,8 @@
+// Copyright 2021 UlianaBespalova
 #include <stdio.h>
 #include "shapes.h"
 
-
-int main()
-{
+int main() {
     Triangle triangle;
     int err = input_triangle(&triangle);
     if (err != 0) {
