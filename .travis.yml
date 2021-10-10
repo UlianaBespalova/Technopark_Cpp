@@ -13,10 +13,6 @@ script:
   - sudo apt install valgrind
   - sudo apt install cppcheck
   
-  - sudo apt install python3
-  - sudo apt install python3-pip
-  - pip install cpplint
-  
   - git clone https://github.com/google/googletest.git -b release-1.11.0
   - cd googletest
   - mkdir build
@@ -30,4 +26,4 @@ script:
   
   - valgrind ./tests
   - cppcheck --inconclusive --enable=all --language=c ./shapes.c ./main.c
-  - cpplint ./shapes.c ./main.c ./tests.cpp
+  
