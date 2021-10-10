@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9.2)
 project(Shapes)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++0x -Wall -ggdb3")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++0x -Wall -ggdb3 --coverage")
 
 ADD_SUBDIRECTORY (googletest)
 enable_testing()
