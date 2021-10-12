@@ -1,6 +1,9 @@
 // Copyright 2021 UlianaBespalova
 #include "gtest/gtest.h"
+
+extern "C" {
 #include "shapes.h"
+}
 
 TEST(Shapes, TestGetValue) {
     const int iter = 4;

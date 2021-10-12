@@ -7,7 +7,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++0x -Wall -ggdb3")
 enable_testing()
 find_package(GTest REQUIRED)
 
-
 add_executable(shapes main.c shapes.c)
 target_link_libraries(shapes m)
 

@@ -1,3 +1,6 @@
+#ifndef SHAPES_H
+#define SHAPES_H
+
 # define M_PI           3.14159265358979323846  /* pi */
 
 typedef struct {
@@ -16,9 +19,6 @@ typedef struct {
 } Regular_polygon;
 
 
-#ifdef __cplusplus
-extern "C"
-{
 double get_value(char *str);
 
 int input_triangle(Triangle *triangle);
@@ -28,18 +28,7 @@ double get_polygon_side_by_inscribed_circle(const Circle* circle, int side_num);
 double get_radius_by_inscribed_triangle(const Triangle *triangle);
 
 double get_polygon_area(const Regular_polygon* polygon);
-}
+
+double get_square_by_inscribed_triangle(const Triangle *triangle);
+
 #endif
-
-
-double get_value(char *str);
-
-int input_triangle(Triangle *triangle);
-
-double get_polygon_side_by_inscribed_circle(const Circle* circle, int side_num);
-
-double get_radius_by_inscribed_triangle(const Triangle *triangle);
-
-double get_polygon_area(const Regular_polygon* polygon);
-
-
