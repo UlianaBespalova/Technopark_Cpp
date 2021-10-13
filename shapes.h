@@ -21,7 +21,7 @@ typedef struct {
 
 double get_value(char *str);
 
-int input_triangle(Triangle *triangle);
+Triangle create_triangle();
 
 double get_polygon_side_by_inscribed_circle(const Circle* circle, int side_num);
 

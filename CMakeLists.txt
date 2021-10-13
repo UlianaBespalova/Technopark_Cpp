@@ -10,8 +10,6 @@ find_package(GTest REQUIRED)
 add_executable(shapes main.c shapes.c)
 target_link_libraries(shapes m)
 
-#Link with GoogleTest
 include_directories(${GTEST_INCLUDE_DIRS})
 add_executable(tests tests.cpp shapes.c)
 target_link_libraries(tests ${GTEST_LIBRARIES} m pthread)
-#===============================================================
