@@ -24,7 +24,7 @@ install:
     - sudo cp *.a /usr/lib
 
 script:
-    - cd /home/travis/build/UlianaBespalova/tp_cpp
+    - cd /home/travis/build/UlianaBespalova/Technopark_Cpp
     - cmake . || travis_terminate 1;
     - make || travis_terminate 1;
     - ./homework_2 || travis_terminate 1;
