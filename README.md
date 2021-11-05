@@ -1,7 +1,5 @@
 
-
-
-# Домашнее задание №1: ИЗ №1
+# Домашнее задание №2: ИЗ №2
 
 [![Build Status](https://app.travis-ci.com/UlianaBespalova/Technopark_Cpp.svg?branch=homework_2)](https://app.travis-ci.com/UlianaBespalova/Technopark_Cpp)   [![codecov](https://codecov.io/gh/UlianaBespalova/Technopark_Cpp/branch/homework_2/graph/badge.svg?token=I69ZMCHZZZ)](https://codecov.io/gh/UlianaBespalova/Technopark_Cpp)
 
@@ -68,3 +66,5 @@ make
     Простой алгоритм: 64 ms
     Параллельный алгоритм: 17 ms
     
+
+### Беспалова Ульяна, ML-11
