@@ -33,9 +33,11 @@ script:
     - cppcheck project --inconclusive --enable=all --language=c --suppress=missingIncludeSystem
 
 after_script:
-    - lcov --capture --directory . --output-file coverage.info
-    - lcov --list coverage.info
-    - bash <(curl -s https://codecov.io/bash) -f coverage.info
-    - curl -s https://codecov.io/bash | bash -s - -t $CODECOV_TOKEN
+    - lcov --capture --directory ./CMakeFiles/simple_library.dir/project/simple --directory CMakeFiles/parallel_library.dir/project/parallel --output-file coverage.info
+    - bash <(curl -s https://codecov.io/bash)
+#     - lcov --capture --directory . --output-file coverage.info
+#     - lcov --list coverage.info
+#     - bash <(curl -s https://codecov.io/bash) -f coverage.info
+#     - curl -s https://codecov.io/bash | bash -s - -t $CODECOV_TOKEN
     
-    - ls
+#     - ls
