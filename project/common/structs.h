@@ -2,29 +2,34 @@
 #ifndef HOMEWORK_2_STRUCTS_H
 #define HOMEWORK_2_STRUCTS_H
 
-typedef struct Position {
-    char position[24];
-    unsigned int id;
-} Position;
+#define LENGTH_NAME 16
+#define LENGTH_SURNAME 24
+#define LENGTH_POSITION 24
+#define NUM_EMPLOYEES 7
 
-typedef struct Employee {
+typedef struct position {
+    char position[LENGTH_POSITION];
+    unsigned int id;
+} position_t;
+
+typedef struct employee {
     unsigned int position_id;
     unsigned int salary;
     unsigned int experience;
     unsigned int age;
-    char name[16];
-    char surname[24];
+    char name[LENGTH_NAME];
+    char surname[LENGTH_SURNAME];
     char sex;
-} Employee;
+} employee_t;
 
-typedef struct Average_salary {
-    char position[24];
+typedef struct average_salary {
+    char position[LENGTH_POSITION];
     unsigned int salary;
-} Average_salary;
+} average_salary_t;
 
-typedef struct Count_average {
+typedef struct count_average_t {
     unsigned int total;
     unsigned int count;
-} Count_average;
+} count_average_t;
 
 #endif  // HOMEWORK_2_STRUCTS_H

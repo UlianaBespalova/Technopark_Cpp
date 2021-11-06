@@ -6,7 +6,7 @@
 
 int main() {
     int size_positions = 0;
-    Average_salary *aver_salaries = parallel_count_average_salaries(
+    average_salary_t *aver_salaries = parallel_count_average_salaries(
             "project/test/data/input_1000.txt",
             "project/test/data/positions.txt",
             &size_positions);

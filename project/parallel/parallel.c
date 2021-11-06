@@ -7,47 +7,44 @@
 
 #include "parallel.h"
 
-Position *get_positions_from_file(const char *file_name, int *size_positions) {
-    FILE *fptr = fopen(file_name, "r");
+position_t *get_positions_from_fileptr(FILE *fptr, int *size_positions) {
     if (fptr == NULL) {
         return NULL;
     }
     if (fscanf(fptr, "%d\n", size_positions) != 1) {
-        fclose(fptr);
         return NULL;
     }
 
-    Position *positions =
-            (Position *)malloc(sizeof(Position) * (*size_positions));
+    position_t *positions =
+            (position_t *)malloc(sizeof(position_t) * (*size_positions));
     if (positions == NULL) {
-        fclose(fptr);
         return NULL;
     }
     for (int i = 0; i < *size_positions; i++) {
         if (fscanf(fptr, "%24s\n", positions[i].position) != 1) {
             free(positions);
-            fclose(fptr);
             return NULL;
         }
     }
-    fclose(fptr);
     return positions;
 }
 
-Employee *get_k_employees_from_file(FILE *fptr, int k) {
+employee_t *get_k_employees_from_fileptr(FILE *fptr, int k) {
     if (fptr == NULL) {
         return NULL;
     }
-    Employee *employees = (Employee *)malloc(sizeof(Employee) * (k));
+    employee_t *employees = (employee_t *)malloc(sizeof(employee_t) * (k));
     if (employees == NULL) {
         return NULL;
     }
+
+    const char *EMPLOYEE_FORMAT = "%u %u %u %u %16s %24s %c\n";
     for (int i = 0; i < k; i++) {
-        if (fscanf(fptr, "%u %u %u %u %16s %24s %c\n",
+        if (fscanf(fptr, EMPLOYEE_FORMAT,
                    &employees[i].position_id, &employees[i].salary,
                    &employees[i].experience, &employees[i].age,
                    employees[i].name, employees[i].surname,
-                   &employees[i].sex) != 7) {
+                   &employees[i].sex) != NUM_EMPLOYEES) {
             free(employees);
             return NULL;
         }
@@ -55,14 +52,14 @@ Employee *get_k_employees_from_file(FILE *fptr, int k) {
     return employees;
 }
 
-Average_salary *count_average_salary(const Count_average *count_salary,
-                                     const Position *positions,
+average_salary_t *count_average_salary(const count_average_t *count_salary,
+                                     const position_t *positions,
                                      int size_positions) {
     if (count_salary == NULL || positions == NULL) {
         return NULL;
     }
-    Average_salary *aver_salaries =
-            (Average_salary *)malloc(sizeof(Average_salary) * (size_positions));
+    average_salary_t *aver_salaries =
+            (average_salary_t *)malloc(sizeof(average_salary_t) * (size_positions));
     if (aver_salaries == NULL) {
         return NULL;
     }
@@ -77,30 +74,36 @@ Average_salary *count_average_salary(const Count_average *count_salary,
     return aver_salaries;
 }
 
-Average_salary *parallel_count_average_salaries(const char *employees_file_name,
+average_salary_t *parallel_count_average_salaries(const char *employees_file_name,
                                                 const char *positions_file_name,
                                                 int *size_positions) {
-    Position *positions =
-            get_positions_from_file(positions_file_name, size_positions);
-    if (positions == NULL) {
+
+    FILE *fptr_positions = fopen(positions_file_name, "r");
+    if (fptr_positions == NULL) {
         return NULL;
     }
+    position_t *positions = get_positions_from_fileptr(fptr_positions, size_positions);
+    if (positions == NULL) {
+        fclose(fptr_positions);
+        return NULL;
+    }
+    fclose(fptr_positions);
 
-    FILE *fptr = fopen(employees_file_name, "r");
-    if (fptr == NULL) {
+    FILE *fptr_employees = fopen(employees_file_name, "r");
+    if (fptr_employees == NULL) {
         free(positions);
         return NULL;
     }
     int fd[2];
     if (pipe(fd) < 0) {
         free(positions);
-        fclose(fptr);
+        fclose(fptr_employees);
         return NULL;
     }
     int size_employees = 0;
-    if (fscanf(fptr, "%d\n", &size_employees) != 1) {
+    if (fscanf(fptr_employees, "%d\n", &size_employees) != 1) {
         free(positions);
-        fclose(fptr);
+        fclose(fptr_employees);
         return NULL;
     }
 
@@ -114,30 +117,30 @@ Average_salary *parallel_count_average_salaries(const char *employees_file_name,
     employees_per_process[process_number - 1] =
             n_per_process + size_employees % process_number;
 
-    Count_average *count_salary =
-            (Count_average *)malloc(sizeof(Count_average) * (*size_positions));
+    count_average_t *count_salary =
+            (count_average_t *)malloc(sizeof(count_average_t) * (*size_positions));
     if (count_salary == NULL) {
         free(positions);
-        fclose(fptr);
+        fclose(fptr_employees);
         return NULL;
     }
     for (int i = 0; i < *size_positions; i++) {
         count_salary[i].total = 0;
         count_salary[i].count = 0;
     }
-    size_t count_salary_size = sizeof(Count_average) * (*size_positions);
+    size_t count_salary_size = sizeof(count_average_t) * (*size_positions);
 
     pid_t pid;
     for (size_t i = 0; i < process_number; i++) {
-        Employee *employees =
-                get_k_employees_from_file(fptr, employees_per_process[i]);
+        employee_t *employees =
+                get_k_employees_from_fileptr(fptr_employees, employees_per_process[i]);
         pid = fork();
         if (pid == -1 || employees == NULL) {
             close(fd[0]);
             close(fd[1]);
             free(positions);
             free(count_salary);
-            fclose(fptr);
+            fclose(fptr_employees);
             return NULL;
         }
         if (pid == 0) {
@@ -151,14 +154,14 @@ Average_salary *parallel_count_average_salaries(const char *employees_file_name,
             close(fd[1]);
             free(employees);
             free(count_salary);
-            fclose(fptr);
+            fclose(fptr_employees);
             exit(0);
         }
         free(employees);
     }
 
-    Count_average *count_average_final =
-            (Count_average *)malloc(sizeof(Count_average) * (*size_positions));
+    count_average_t *count_average_final =
+            (count_average_t *)malloc(sizeof(count_average_t) * (*size_positions));
 
     for (size_t i = 0; i < process_number; i++) {
         read(fd[0], count_average_final, count_salary_size);
@@ -167,12 +170,12 @@ Average_salary *parallel_count_average_salaries(const char *employees_file_name,
             count_salary[j].total += count_average_final[j].total;
         }
     }
-    Average_salary *average_salary =
+    average_salary_t *average_salary =
             count_average_salary(count_salary, positions, *size_positions);
 
     close(fd[0]);
     close(fd[1]);
-    fclose(fptr);
+    fclose(fptr_employees);
     free(positions);
 free(count_salary);
     free(count_average_final);

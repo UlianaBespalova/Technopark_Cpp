@@ -6,15 +6,15 @@
 
 #include "structs.h"
 
-Position *get_positions_from_file(const char *file_name, int *size_positions);
+position_t *get_positions_from_fileptr(FILE *fptr, int *size_positions);
 
-Employee *get_k_employees_from_file(FILE *fptr, int k);
+employee_t *get_k_employees_from_fileptr(FILE *fptr, int k);
 
-Average_salary *count_average_salary(const Count_average *count_salary,
-                                     const Position *positions,
+average_salary_t *count_average_salary(const count_average_t *count_salary,
+                                     const position_t *positions,
                                      int size_positions);
 
-Average_salary *parallel_count_average_salaries(const char *employees_file_name,
+average_salary_t *parallel_count_average_salaries(const char *employees_file_name,
                                                 const char *positions_file_name,
                                                 int *size_positions);
 
