@@ -1,0 +1,186 @@
+// Copyright 2021 UlianaBespalova
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include "parallel.h"
+
+position_t *get_positions_from_fileptr(FILE *fptr, int *size_positions) {
+    if (fptr == NULL) {
+        return NULL;
+    }
+    if (fscanf(fptr, "%d\n", size_positions) != 1) {
+        return NULL;
+    }
+
+    position_t *positions =
+            (position_t *)malloc(sizeof(position_t) * (*size_positions));
+    if (positions == NULL) {
+        return NULL;
+    }
+    for (int i = 0; i < *size_positions; i++) {
+        if (fscanf(fptr, "%24s\n", positions[i].position) != 1) {
+            free(positions);
+            return NULL;
+        }
+    }
+    return positions;
+}
+
+employee_t *get_k_employees_from_fileptr(FILE *fptr, int k) {
+    if (fptr == NULL) {
+        return NULL;
+    }
+    employee_t *employees = (employee_t *)malloc(sizeof(employee_t) * (k));
+    if (employees == NULL) {
+        return NULL;
+    }
+
+    const char *EMPLOYEE_FORMAT = "%u %u %u %u %16s %24s %c\n";
+    for (int i = 0; i < k; i++) {
+        if (fscanf(fptr, EMPLOYEE_FORMAT,
+                   &employees[i].position_id, &employees[i].salary,
+                   &employees[i].experience, &employees[i].age,
+                   employees[i].name, employees[i].surname,
+                   &employees[i].gender) != NUM_EMPLOYEES) {
+            free(employees);
+            return NULL;
+        }
+    }
+    return employees;
+}
+
+average_salary_t *count_average_salary(const count_average_t *count_salary,
+                                     const position_t *positions,
+                                     int size_positions) {
+    if (count_salary == NULL || positions == NULL) {
+        return NULL;
+    }
+    average_salary_t *aver_salaries =
+            (average_salary_t *)malloc(sizeof(average_salary_t) * (size_positions));
+    if (aver_salaries == NULL) {
+        return NULL;
+    }
+
+    for (int i = 0; i < size_positions; i++) {
+        strcpy(aver_salaries[i].position, positions[i].position);
+        if (count_salary[i].count > 0) {
+            aver_salaries[i].salary =
+                    (int)(count_salary[i].total / count_salary[i].count);
+        }
+    }
+    return aver_salaries;
+}
+
+average_salary_t *parallel_count_average_salaries(const char *employees_file_name,
+                                                const char *positions_file_name,
+                                                int *size_positions) {
+
+    FILE *fptr_positions = fopen(positions_file_name, "r");
+    if (fptr_positions == NULL) {
+        return NULL;
+    }
+    position_t *positions = get_positions_from_fileptr(fptr_positions, size_positions);
+    if (positions == NULL) {
+        fclose(fptr_positions);
+        return NULL;
+    }
+    fclose(fptr_positions);
+
+    FILE *fptr_employees = fopen(employees_file_name, "r");
+    if (fptr_employees == NULL) {
+        free(positions);
+        return NULL;
+    }
+    int fd[2];
+    if (pipe(fd) < 0) {
+        free(positions);
+        fclose(fptr_employees);
+        return NULL;
+    }
+    int size_employees = 0;
+    if (fscanf(fptr_employees, "%d\n", &size_employees) != 1) {
+        free(positions);
+        fclose(fptr_employees);
+        return NULL;
+    }
+
+    const int process_number = 4;
+    int n_per_process = size_employees / process_number;
+
+    int employees_per_process[process_number];
+    for (int i = 0; i < process_number - 1; i++) {
+        employees_per_process[i] = n_per_process;
+    }
+    employees_per_process[process_number - 1] =
+            n_per_process + size_employees % process_number;
+
+    count_average_t *count_salary =
+            (count_average_t *)malloc(sizeof(count_average_t) * (*size_positions));
+    if (count_salary == NULL) {
+        free(positions);
+        fclose(fptr_employees);
+        return NULL;
+    }
+    for (int i = 0; i < *size_positions; i++) {
+        count_salary[i].total = 0;
+        count_salary[i].count = 0;
+    }
+    size_t count_salary_size = sizeof(count_average_t) * (*size_positions);
+
+    pid_t pid;
+    for (size_t i = 0; i < process_number; i++) {
+        employee_t *employees =
+                get_k_employees_from_fileptr(fptr_employees, employees_per_process[i]);
+        pid = fork();
+        if (pid == -1 || employees == NULL) {
+            close(fd[0]);
+            close(fd[1]);
+            free(positions);
+            free(count_salary);
+            fclose(fptr_employees);
+            return NULL;
+        }
+        if (pid == 0) {
+            for (int j = 0; j < employees_per_process[i]; j++) {
+                int pos_id = (int)employees[j].position_id;
+                count_salary[pos_id].count++;
+                count_salary[pos_id].total += employees[j].salary;
+            }
+            write(fd[1], count_salary, count_salary_size);
+            close(fd[0]);
+            close(fd[1]);
+            free(employees);
+            free(count_salary);
+            fclose(fptr_employees);
+            exit(0);
+        }
+        free(employees);
+    }
+
+    count_average_t *count_average_final =
+            (count_average_t *)malloc(sizeof(count_average_t) * (*size_positions));
+
+    for (size_t i = 0; i < process_number; i++) {
+        read(fd[0], count_average_final, count_salary_size);
+        for (int j = 0; j < *size_positions; j++) {
+            count_salary[j].count += count_average_final[j].count;
+            count_salary[j].total += count_average_final[j].total;
+        }
+    }
+    average_salary_t *average_salary =
+            count_average_salary(count_salary, positions, *size_positions);
+
+    close(fd[0]);
+    close(fd[1]);
+    fclose(fptr_employees);
+    free(positions);
+free(count_salary);
+    free(count_average_final);
+    int status = 0;
+    wait(&status);
+
+    return average_salary;
+}

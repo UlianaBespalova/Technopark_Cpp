@@ -1,0 +1,43 @@
+dist:     alpine
+sudo:     required
+
+language: c
+
+os: linux
+
+compiler: gcc
+
+env:
+  global:
+    - CODECOV_TOKEN="b233dcfd-60f5-4f1e-a30f-846ec3f3a3f6"
+
+install:
+    - sudo apt-get update
+    - sudo apt-get install cmake
+    - sudo apt-get install lcov
+    - sudo apt-get install valgrind
+    - sudo apt install cppcheck
+    # Google tests
+    - sudo apt-get install libgtest-dev
+    - cd /usr/src/gtest
+    - sudo cmake .
+    - sudo make
+    - sudo cp *.a /usr/lib
+
+script:
+    - cd /home/travis/build/UlianaBespalova/Technopark_Cpp
+    - cmake . || travis_terminate 1;
+    - make || travis_terminate 1;
+    - ./homework_2 || travis_terminate 1;
+    - valgrind --leak-check=full ./homework_2 || travis_terminate 1;
+    - cppcheck project --inconclusive --enable=all --language=c --suppress=missingIncludeSystem
+
+after_script:
+    - lcov --capture --directory ./CMakeFiles/simple_library.dir/project/simple --directory CMakeFiles/parallel_library.dir/project/parallel --output-file coverage.info
+    - bash <(curl -s https://codecov.io/bash)
+#     - lcov --capture --directory . --output-file coverage.info
+#     - lcov --list coverage.info
+#     - bash <(curl -s https://codecov.io/bash) -f coverage.info
+#     - curl -s https://codecov.io/bash | bash -s - -t $CODECOV_TOKEN
+    
+#     - ls
