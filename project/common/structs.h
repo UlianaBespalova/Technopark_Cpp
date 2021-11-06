@@ -7,6 +7,11 @@
 #define LENGTH_POSITION 24
 #define NUM_EMPLOYEES 7
 
+typedef enum gender {
+    MALE,
+    FEMALE
+} gender_t;
+
 typedef struct position {
     char position[LENGTH_POSITION];
     unsigned int id;
@@ -19,7 +24,7 @@ typedef struct employee {
     unsigned int age;
     char name[LENGTH_NAME];
     char surname[LENGTH_SURNAME];
-    char sex;
+    gender_t gender;
 } employee_t;
 
 typedef struct average_salary {

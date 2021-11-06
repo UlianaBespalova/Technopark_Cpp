@@ -55,7 +55,7 @@ employee_t *get_employees_from_file(const char *file_name, int *size_employees) 
                    &employees[i].position_id, &employees[i].salary,
                    &employees[i].experience, &employees[i].age,
                    employees[i].name, employees[i].surname,
-                   &employees[i].sex) != NUM_EMPLOYEES) {
+                   &employees[i].gender) != NUM_EMPLOYEES) {
             free(employees);
             fclose(fptr);
             return NULL;

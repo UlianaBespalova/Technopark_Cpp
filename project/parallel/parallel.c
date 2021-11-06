@@ -44,7 +44,7 @@ employee_t *get_k_employees_from_fileptr(FILE *fptr, int k) {
                    &employees[i].position_id, &employees[i].salary,
                    &employees[i].experience, &employees[i].age,
                    employees[i].name, employees[i].surname,
-                   &employees[i].sex) != NUM_EMPLOYEES) {
+                   &employees[i].gender) != NUM_EMPLOYEES) {
             free(employees);
             return NULL;
         }
